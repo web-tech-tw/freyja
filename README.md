@@ -1,4 +1,4 @@
-# Freyja
+# Freyja 芙蕾雅
 
 > The best friend of LINE OpenChat.
 
