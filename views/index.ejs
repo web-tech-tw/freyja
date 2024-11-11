@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<head>
+    <!-- Freyja - The best friend of LINE OpenChat. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= chatRoomName %> - LINE 社群加入申請驗證系統
+    </title>
+    <link rel="icon" href="/favicon.ico">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/alpinejs@^3/dist/cdn.min.js"></script>
+    <script>
+        Alpine.data("appRoot", () => ({
+            year: new Date().getFullYear(),
+            isSubmitting: false,
+            isSubmitted: false,
+            statusMessage: "",
+            copyMessage: "複製驗證碼",
+            chatRoomName: "<%= chatRoomName %>",
+            chatRoomCode: "",
+            chatRoomUrl: "<%= chatRoomUrl %>",
+            async onSubmit({ target }) {
+                const formData = new FormData(target);
+                if (!formData.get("g-recaptcha-response")) {
+                    this.statusMessage = "請完成驗證";
+                    return;
+                }
+                try {
+                    this.isSubmitting = true;
+                    const response = await fetch("/submission", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    const data = await response.json();
+                    this.isSubmitted = true;
+                    this.chatRoomCode = data.code;
+                } catch (error) {
+                    this.isSubmitting = false;
+                    this.statusMessage = "發生錯誤，請稍後再試";
+                    console.error(error);
+                }
+            },
+            async onClickCopy() {
+                if (!navigator.clipboard) {
+                    this.copyMessage = "您的瀏覽器不支援複製功能，請手動複製";
+                    return;
+                }
+                try {
+                    navigator.clipboard.writeText(this.chatRoomCode);
+                    this.copyMessage = "已複製";
+                    setTimeout(() => {
+                        this.copyMessage = "複製驗證碼";
+                    }, 3000);
+                } catch (error) {
+                    this.copyMessage = "複製失敗，請手動複製";
+                    console.error(error);
+                }
+            },
+            onClickContinue() {
+                location.assign(this.chatRoomUrl);
+            },
+        }));
+    </script>
+</head>
+
+<body>
+    <div class="relative bg-white" x-data="appRoot">
+        <div class="flex justify-center text-center py-8" x-show="!isSubmitted">
+            <form x-on:submit.prevent="onSubmit">
+                <div class="my-8">
+                    歡迎加入
+                    <span x-text="chatRoomName"></span>
+                    的 LINE 社群
+                </div>
+                <div class="my-8 font-bold text-yellow-600" x-text="statusMessage"></div>
+                <div class="my-12">
+                    <%- locals.captchaScript %>
+                </div>
+                <button type="submit" class="my-8 px-8 py-3 text-base text-white bg-green-600 hover:bg-green-700"
+                    x-bind:disabled="isSubmitting">
+                    送出申請
+                </button>
+            </form>
+        </div>
+        <div class="text-center py-8" x-show="isSubmitted">
+            <div class="my-8">
+                加入
+                <span x-text="chatRoomName"></span>
+                社群
+            </div>
+            <div class="my-8">
+                請複製以下代碼，並貼到答案欄位中
+            </div>
+            <div class="mt-8">
+                <input type="text" value="" readonly class="w-64 px-4 py-2 text-center border border-gray-300"
+                    x-model="chatRoomCode">
+            </div>
+            <div class="mt-1">
+                <button class="my-8 px-8 py-3 text-base text-white bg-gray-600 hover:bg-gray-700"
+                    x-on:click="onClickCopy" x-text="copyMessage">
+                </button>
+            </div>
+            <div class="my-8">
+                <button class="my-8 px-8 py-3 text-base text-white bg-green-600 hover:bg-green-700"
+                    x-on:click="onClickContinue">
+                    繼續前往 LINE 社群
+                </button>
+            </div>
+        </div>
+        <footer class="text-sm leading-6 text-center text-gray-500">
+            &copy;
+            <span x-text="year"></span>
+            <span x-text="chatRoomName"></span>
+            的 LINE 社群加入申請驗證系統 - Freyja
+        </footer>
+    </div>
+</body>

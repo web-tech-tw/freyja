@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express-basic-auth": "^1.2.1",
+    "express-recaptcha": "^5.1.0",
+    "express.js": "^1.0.0",
+    "ky": "^1.7.2",
+    "lowdb": "^1.0.0",
+    "nodemon": "^3.1.7",
+    "shortid": "^2.2.16"
+  }
+}
