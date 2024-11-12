@@ -62,14 +62,14 @@ app.get("/admin", adminAuth, (_, res) => {
     });
 });
 
-app.get("/submission", adminAuth, (req, res, next) => {
-    if (!!req.query.code) {
+app.get("/submissions/:code", adminAuth, (req, res, next) => {
+    if (!!req.params.code) {
         next();
         return;
     }
     res.status(400).send("bad request");
 }, (req, res) => {
-    const { code } = req.query;
+    const { code } = req.params;
     const item = db.get("codes").
         find((i) => i.code === code).
         value();
@@ -80,7 +80,7 @@ app.get("/submission", adminAuth, (req, res, next) => {
     res.status(200).send(item);
 });
 
-app.post("/submission", captcha.middleware.verify, (req, res, next) => {
+app.post("/submissions", captcha.middleware.verify, (req, res, next) => {
     if (!req.recaptcha.error) {
         next();
         return;

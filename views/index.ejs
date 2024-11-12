@@ -28,7 +28,7 @@
                 }
                 try {
                     this.isSubmitting = true;
-                    const response = await fetch("/submission", {
+                    const response = await fetch("/submissions", {
                         method: "POST",
                         body: formData,
                     });

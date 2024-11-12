@@ -22,7 +22,7 @@
                 const code = formData.get("chatRoomCode");
                 try {
                     this.isSubmitting = true;
-                    const response = await fetch(`/submission?code=${code}`, {
+                    const response = await fetch(`/submissions/${code}`, {
                         method: "GET",
                     });
                     this.isSubmitting = false;
